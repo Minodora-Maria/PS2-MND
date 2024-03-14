@@ -1,0 +1,55 @@
+// Definirea pinului la care este conectat LED-ul
+const int pinLED = 13;
+// Definirea pinului la care este conectat senzorul de temperatură
+const int pinLM35 = A0;
+
+void setup() {
+  // Inițializarea pinului LED ca ieșire
+  pinMode(pinLED, OUTPUT);
+
+  // Inițializarea comunicării seriale cu baud rate-ul specificat
+  Serial.begin(9600); // Baud rate-ul trebuie să fie același cu cel setat în Serial Monitor
+}
+
+void loop() {
+	//Cod pentru citirea temperaturii
+  // Citirea valorii analogice de la senzorul de temperatură
+  int valoareAnalogica = analogRead(pinLM35);
+
+  // Conversia valorii analogice la temperatura în grade Celsius
+  float temperaturaCelsius = valoareAnalogica * 0.48828125;
+
+  // Afișarea temperaturii în Serial Monitor
+  Serial.print("Temperatura: ");
+  Serial.print(temperaturaCelsius);
+  Serial.println(" °C");
+
+  // Controlul LED-ului în funcție de valoarea temperaturii
+  if (temperaturaCelsius > 25) {
+    digitalWrite(pinLED, HIGH); // Aprinde LED-ul dacă temperatura este mai mare de 25°C
+  } else {
+    digitalWrite(pinLED, LOW); // Stinge LED-ul în caz contrar
+  }
+
+  // Așteptare pentru a nu suprasolicita Serial Monitor-ul
+  delay(1000);
+  
+
+	//cod pentru aprinderea si stingerea led-ului
+  // Verificarea dacă sunt date disponibile pentru citire
+  if (Serial.available() > 0) {
+    // Citirea comenzii de la Serial Monitor
+    char command = Serial.read();
+
+    // Verificarea comenzii și acționarea în consecință
+    if (command == 'A') {
+      digitalWrite(pinLED, HIGH); // Aprinde LED-ul
+      Serial.println("LED-ul a fost aprins.");
+    } else if (command == 'S') {
+      digitalWrite(pinLED, LOW); // Stinge LED-ul
+      Serial.println("LED-ul a fost stins.");
+    } else {
+      Serial.println("Comanda invalida. Utilizati 'A' pentru aprindere si 'S' pentru stingere.");
+    }
+  }
+}
